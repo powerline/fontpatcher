@@ -104,6 +104,9 @@ class FontPatcher(object):
 
 			target_font.em = target_font_em_original
 
+			target_font[0xfb01].clear()
+			target_font[0xfb02].clear()
+
 			# Generate patched font
 			extension = os.path.splitext(target_font.path)[1]
 			if extension.lower() not in ['.ttf', '.otf']:
