@@ -55,7 +55,7 @@ class FontPatcher(object):
 
 			# Find the biggest char width and height in the Latin-1 extended range and the box drawing range
 			# This isn't ideal, but it works fairly well - some fonts may need tuning after patching
-			for cp in range(0x00, 0x17f) + range(0x2500, 0x2600):
+			for cp in list(range(0x00, 0x17f)) + list(range(0x2500, 0x2600)):
 				try:
 					bbox = target_font[cp].boundingBox()
 				except TypeError:
