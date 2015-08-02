@@ -162,10 +162,10 @@ Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-0 1950 m 1
- 1060 788 l 1
- 0 -375 l 1
- 0 1950 l 1
+0 1700 m 1
+ 1060 675 l 1
+ 0 -365 l 1
+ 0 1700 l 1
 EndSplineSet
 EndChar
 
@@ -176,13 +176,13 @@ Flags: HW
 LayerCount: 2
 Fore
 SplineSet
--57 1812 m 1
- 39 1907 l 1
- 1060 788 l 1
- 39 -331 l 1
- -57 -236 l 1
- 875 788 l 1
- -57 1812 l 1
+-57 1600 m 1
+ 39 1700 l 1
+ 1060 675 l 1
+ 39 -365 l 1
+ -57 -265 l 1
+ 875 675 l 1
+ -57 1600 l 1
 EndSplineSet
 EndChar
 
@@ -193,10 +193,10 @@ Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-1060 -375 m 1
- 0 788 l 1
- 1060 1950 l 1
- 1060 -375 l 1
+1060 -365 m 1
+ 0 675 l 1
+ 1060 1700 l 1
+ 1060 -365 l 1
 EndSplineSet
 EndChar
 
@@ -207,13 +207,13 @@ Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-185 788 m 1
- 1117 -236 l 1
- 1021 -331 l 1
- 0 788 l 1
- 1021 1907 l 1
- 1117 1812 l 1
- 185 788 l 1
+185 675 m 1
+ 1117 -265 l 1
+ 1021 -365 l 1
+ 0 675 l 1
+ 1021 1700 l 1
+ 1117 1600 l 1
+ 185 675 l 1
 EndSplineSet
 EndChar
 
