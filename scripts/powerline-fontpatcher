@@ -112,6 +112,11 @@ def patch_one_font(source_font, target_font, rename_font=True):
 
 	target_font.em = target_font_em_original
 
+	# FIXME: Menlo and Meslo font do have these substitutes, but U+FB01 and
+	#        U+FB02 still do not show up for fi and fl.
+	target_font[0xFB01].removePosSub('*')  # fi ligature
+	target_font[0xFB02].removePosSub('*')  # fl ligature
+
 	# Generate patched font
 	extension = os.path.splitext(target_font.path)[1]
 	if extension.lower() not in ['.ttf', '.otf']:
