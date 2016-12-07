@@ -47,6 +47,7 @@ def patch_one_font(source_font, target_font, rename_font=True):
 	if rename_font:
 		target_font.familyname += ' for Powerline'
 		target_font.fullname += ' for Powerline'
+		target_font.fullname = re.sub('/', ' ', target_font.fullname)
 		fontname, style = FONT_NAME_RE.match(target_font.fontname).groups()
 		target_font.fontname = fontname + 'ForPowerline'
 		if style is not None:
