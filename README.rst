@@ -5,10 +5,13 @@ Powerline font patcher
 :Source: https://github.com/Lokaltog/powerline-fontpatcher
 :Version: beta
 
-**Script to patch arrow and symbol glyphs into fonts for usage with 
+**Script to patch arrow and symbol glyphs into fonts for usage with
 Powerline and other compatible plugins.**
 
 ------
 
-Check out `powerline-fonts <https://github.com/Lokaltog/powerline-fonts>`_ 
+Check out INSTALL.md for more detailed installation and usage instructions.
+
+Check out `powerline-fonts <https://github.com/Lokaltog/powerline-fonts>`_
 for pre-patched versions of popular, open source coding fonts.
+
