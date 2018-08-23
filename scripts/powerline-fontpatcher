@@ -1,12 +1,10 @@
-#!/usr/bin/env python2
-# vim:fileencoding=utf-8:noet
+#!/usr/bin/env python3
+# -*- coding utf-8 -*-
 
 import argparse
 import sys
 import re
 import os.path
-
-from itertools import chain
 
 try:
 	import fontforge
@@ -39,9 +37,6 @@ FONT_NAME_RE = re.compile(r'^([^-]*)(?:(-.*))?$')
 
 
 def patch_one_font(source_font, target_font, rename_font=True):
-	target_font_em_original = target_font.em
-	target_font.em = 2048
-	target_font.encoding = 'ISO10646'
 
 	# Rename font
 	if rename_font:
@@ -56,38 +51,20 @@ def patch_one_font(source_font, target_font, rename_font=True):
 		target_font.appendSFNTName(
 			'English (US)', 'Compatible Full', target_font.fullname)
 
-	source_bb = source_font['block'].boundingBox()
-	target_bb = [0, 0, 0, 0]
-	target_font_width = 0
-
-	# Find the biggest char width and height in the Latin-1 extended range and 
-	# the box drawing range This isn't ideal, but it works fairly well - some 
-	# fonts may need tuning after patching.
-	for cp in chain(range(0x00, 0x17f), range(0x2500, 0x2600)):
-		try:
-			bbox = target_font[cp].boundingBox()
-		except TypeError:
-			continue
-		if not target_font_width:
-			target_font_width = target_font[cp].width
-		if bbox[0] < target_bb[0]:
-			target_bb[0] = bbox[0]
-		if bbox[1] < target_bb[1]:
-			target_bb[1] = bbox[1]
-		if bbox[2] > target_bb[2]:
-			target_bb[2] = bbox[2]
-		if bbox[3] > target_bb[3]:
-			target_bb[3] = bbox[3]
+	source_bb = source_font['block']
+	target_bb = target_font['a']
+	target_font_width = target_bb.width
 
 	# Find source and target size difference for scaling
-	x_ratio = (target_bb[2] - target_bb[0]) / (source_bb[2] - source_bb[0])
-	y_ratio = (target_bb[3] - target_bb[1]) / (source_bb[3] - source_bb[1])
+	x_ratio = target_bb.width / source_bb.width
+	print('X: (0, %d) -> (0, %d)' % (source_bb.width, target_bb.width))
+	y_ratio = (target_font.hhea_ascent - target_font.hhea_descent) / (source_font.hhea_ascent - source_font.hhea_descent)
+	print('Y: (%d, %d) -> (%d, %d)' % (source_font.hhea_ascent, source_font.hhea_descent, target_font.hhea_ascent, target_font.hhea_descent))
 	scale = psMat.scale(x_ratio, y_ratio)
 
 	# Find source and target midpoints for translating
-	x_diff = target_bb[0] - source_bb[0]
-	y_diff = target_bb[1] - source_bb[1]
-	translate = psMat.translate(x_diff, y_diff)
+	y_diff = (target_font.hhea_ascent + target_font.hhea_descent) / 2 - (source_font.hhea_ascent + source_font.hhea_descent) * y_ratio / 2
+	translate = psMat.translate(0, y_diff)
 	transform = psMat.compose(scale, translate)
 
 	# Create new glyphs from symbol font
@@ -110,13 +87,6 @@ def patch_one_font(source_font, target_font, rename_font=True):
 		# Reset the font's glyph width so it's still considered monospaced
 		target_font[source_glyph.unicode].width = target_font_width
 
-	target_font.em = target_font_em_original
-
-	# FIXME: Menlo and Meslo font do have these substitutes, but U+FB01 and
-	#        U+FB02 still do not show up for fi and fl.
-	target_font[0xFB01].removePosSub('*')  # fi ligature
-	target_font[0xFB02].removePosSub('*')  # fl ligature
-
 	# Generate patched font
 	extension = os.path.splitext(target_font.path)[1]
 	if extension.lower() not in ['.ttf', '.otf']:
@@ -126,9 +96,9 @@ def patch_one_font(source_font, target_font, rename_font=True):
 
 
 def patch_fonts(source_file, target_files, rename_font=True):
-	source_font = fontforge.open(source_file.name)
+	source_font = fontforge.open(source_file.name, 1)
 	for target_file in target_files:
-		target_font = fontforge.open(target_file.name)
+		target_font = fontforge.open(target_file.name, 1)
 		try:
 			patch_one_font(source_font, target_font, rename_font)
 		finally:

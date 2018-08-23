@@ -4,35 +4,42 @@ FullName: PowerlineSymbols
 FamilyName: PowerlineSymbols
 Weight: Medium
 Copyright: Created with FontForge 2.0 (http://fontforge.sf.net)
-UComments: "2012-12-17: Created." 
+UComments: "2012-12-17: Created."
 Version: 001.000
 ItalicAngle: 0
 UnderlinePosition: -100
 UnderlineWidth: 50
 Ascent: 1638
 Descent: 410
+InvalidEm: 0
 LayerCount: 2
-Layer: 0 0 "Back"  1
-Layer: 1 0 "Fore"  0
+Layer: 0 0 "Back" 1
+Layer: 1 0 "Fore" 0
 XUID: [1021 211 26716215 11183012]
+FSType: 0
 OS2Version: 0
 OS2_WeightWidthSlopeOnly: 0
-OS2_UseTypoMetrics: 1
+OS2_UseTypoMetrics: 0
 CreationTime: 1355758773
-ModificationTime: 1355865048
-OS2TypoAscent: 0
-OS2TypoAOffset: 1
-OS2TypoDescent: 0
-OS2TypoDOffset: 1
-OS2TypoLinegap: 0
-OS2WinAscent: 0
-OS2WinAOffset: 1
-OS2WinDescent: 0
-OS2WinDOffset: 1
-HheadAscent: 0
-HheadAOffset: 1
-HheadDescent: 0
-HheadDOffset: 1
+ModificationTime: 1535040138
+PfmFamily: 17
+TTFWeight: 500
+TTFWidth: 5
+LineGap: 184
+VLineGap: 0
+OS2TypoAscent: 1638
+OS2TypoAOffset: 0
+OS2TypoDescent: -410
+OS2TypoDOffset: 0
+OS2TypoLinegap: 184
+OS2WinAscent: 1950
+OS2WinAOffset: 0
+OS2WinDescent: 375
+OS2WinDOffset: 0
+HheadAscent: 1950
+HheadAOffset: 0
+HheadDescent: -375
+HheadDOffset: 0
 OS2Vendor: 'PfEd'
 MarkAttachClasses: 1
 DEI: 91125
@@ -40,10 +47,10 @@ Encoding: UnicodeBmp
 Compacted: 1
 UnicodeInterp: none
 NameList: Adobe Glyph List
-DisplaySize: -24
+DisplaySize: -128
 AntiAlias: 1
 FitToEm: 1
-WinInfo: 0 31 16
+WinInfo: 0 8 2
 BeginPrivate: 0
 EndPrivate
 BeginChars: 65536 8
@@ -158,14 +165,16 @@ EndChar
 StartChar: uniE0B0
 Encoding: 57520 57520 3
 Width: 1060
-Flags: HW
+Flags: HWO
 LayerCount: 2
 Fore
 SplineSet
-0 1950 m 1
- 1060 788 l 1
+-160 -375 m 5
  0 -375 l 1
+ 1060 788 l 1
  0 1950 l 1
+ -160 1950 l 5
+ -160 -375 l 5
 EndSplineSet
 EndChar
 
@@ -193,10 +202,12 @@ Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-1060 -375 m 1
+1220 -375 m 5
+ 1060 -375 l 1
  0 788 l 1
  1060 1950 l 1
- 1060 -375 l 1
+ 1220 1950 l 5
+ 1220 -375 l 5
 EndSplineSet
 EndChar
 
