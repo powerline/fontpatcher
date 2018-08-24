@@ -1,42 +1,42 @@
 #!/usr/bin/env python3
 # -*- coding utf-8 -*-
 
-import argparse
-import sys
 import re
+import sys
 import os.path
+import argparse
 
 try:
-	import fontforge
 	import psMat
+	import fontforge
 except ImportError:
-	sys.stderr.write('The required FontForge modules could not be loaded.\n\n')
+	sys.stderr.write('The required FontForge modules could not be loaded.\n')
 	sys.stderr.write('You need FontForge with Python bindings for this script to work.\n')
 	sys.exit(1)
 
+FONT_NAME_RE = re.compile(r'^([^-]*)(?:(-.*))?$')
 
-def get_argparser(ArgumentParser=argparse.ArgumentParser):
+
+def get_args(ArgumentParser=argparse.ArgumentParser):
 	parser = ArgumentParser(
 		description=('Font patcher for Powerline. '
 		             'Requires FontForge with Python bindings. '
 		             'Stores the patched font as a new, renamed font file by default.')
 	)
+	parser.add_argument('-v', help='verbose', default=False, action='store_true', dest='verbose')
+	parser.add_argument('-x', help='x offset, optional', metavar='int', default=0, type=int, dest='x_diff')
+	parser.add_argument('-y', help='y offset, optional', metavar='int', default=0, type=int, dest='y_diff')
 	parser.add_argument('target_fonts', help='font files to patch', metavar='font',
 	                    nargs='+', type=argparse.FileType('rb'))
-	parser.add_argument('--no-rename',
-	                    help='don\'t add " for Powerline" to the font name',
+	parser.add_argument('-n', help='don\'t add " for Powerline" to the font name',
 	                    default=True, action='store_false', dest='rename_font')
-	parser.add_argument('--source-font', help='source symbol font', metavar='font',
-	                    dest='source_font',
-	                    default='{0}/../fonts/powerline-symbols.sfd'.format(sys.path[0]),
-	                    type=argparse.FileType('rb'))
+	parser.add_argument('-s', help='source symbol font', metavar='font',
+	                    dest='source_font',type=argparse.FileType('rb'),
+	                    default=sys.path[0]+ '/../fonts/powerline-symbols.sfd')
 	return parser
 
 
-FONT_NAME_RE = re.compile(r'^([^-]*)(?:(-.*))?$')
-
-
-def patch_one_font(source_font, target_font, rename_font=True):
+def patch_one_font(source_font, target_font, diff, rename_font=True):
 
 	# Rename font
 	if rename_font:
@@ -51,20 +51,27 @@ def patch_one_font(source_font, target_font, rename_font=True):
 		target_font.appendSFNTName(
 			'English (US)', 'Compatible Full', target_font.fullname)
 
-	source_bb = source_font['block']
-	target_bb = target_font['a']
-	target_font_width = target_bb.width
+	source_width = source_font['block'].width
+	target_width = target_font['a'].width
+
+	source_hhea = (source_font.hhea_ascent, source_font.hhea_descent)
+	target_hhea = (target_font.hhea_ascent, target_font.hhea_descent)
+	souce_height = source_hhea[0] - source_hhea[1]
+	target_heigth = target_hhea[0] - target_hhea[1]
 
 	# Find source and target size difference for scaling
-	x_ratio = target_bb.width / source_bb.width
-	print('X: (0, %d) -> (0, %d)' % (source_bb.width, target_bb.width))
-	y_ratio = (target_font.hhea_ascent - target_font.hhea_descent) / (source_font.hhea_ascent - source_font.hhea_descent)
-	print('Y: (%d, %d) -> (%d, %d)' % (source_font.hhea_ascent, source_font.hhea_descent, target_font.hhea_ascent, target_font.hhea_descent))
+	x_ratio = target_width / source_width
+	y_ratio = target_heigth / souce_height
 	scale = psMat.scale(x_ratio, y_ratio)
 
+
+	print('X:\t(0, %d)\t->\t(%d, %d)' % (source_width, diff[0], target_width + diff[0]))
+	print('Y:\t(%d, %d)\t->\t(%d, %d)' % (
+	      source_hhea + (target_hhea[0] + diff[0], target_hhea[1] + diff[1])))
+
 	# Find source and target midpoints for translating
-	y_diff = (target_font.hhea_ascent + target_font.hhea_descent) / 2 - (source_font.hhea_ascent + source_font.hhea_descent) * y_ratio / 2
-	translate = psMat.translate(0, y_diff)
+	y_diff = (target_hhea[0] + target_hhea[1]) / 2 - (source_hhea[0] + source_hhea[1]) * y_ratio / 2 + diff[1]
+	translate = psMat.translate(diff[0], y_diff)
 	transform = psMat.compose(scale, translate)
 
 	# Create new glyphs from symbol font
@@ -85,30 +92,40 @@ def patch_one_font(source_font, target_font, rename_font=True):
 		target_font.transform(transform)
 
 		# Reset the font's glyph width so it's still considered monospaced
-		target_font[source_glyph.unicode].width = target_font_width
+		target_font[source_glyph.unicode].width = target_width
 
 	# Generate patched font
 	extension = os.path.splitext(target_font.path)[1]
 	if extension.lower() not in ['.ttf', '.otf']:
 		# Default to OpenType if input is not TrueType/OpenType
 		extension = '.otf'
-	target_font.generate('{0}{1}'.format(target_font.fullname, extension))
+	output_file = target_font.fontname + extension
+	target_font.generate(output_file)
+	print('O:\t%s' % output_file)
 
 
-def patch_fonts(source_file, target_files, rename_font=True):
+def patch_fonts(source_file, target_files, diff, rename_font=True):
 	source_font = fontforge.open(source_file.name, 1)
 	for target_file in target_files:
 		target_font = fontforge.open(target_file.name, 1)
 		try:
-			patch_one_font(source_font, target_font, rename_font)
+			patch_one_font(source_font, target_font, diff, rename_font)
 		finally:
 			target_font.close()
 	return 0
 
 
 def main(argv):
-	args = get_argparser().parse_args(argv)
-	return patch_fonts(args.source_font, args.target_fonts, args.rename_font)
+	args = get_args().parse_args(argv)
+	diff = (args.x_diff, args.y_diff)
+	if not args.verbose:
+		fp_null = open('/dev/null', 'w')
+		os.close(2)
+		os.dup2(fp_null.fileno(), 2)
+	ret = patch_fonts(args.source_font, args.target_fonts, diff, args.rename_font)
+	if not args.verbose:
+		fp_null.close()
+	return ret
 
 
 raise SystemExit(main(sys.argv[1:]))
